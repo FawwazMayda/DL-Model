@@ -45,6 +45,36 @@ def inceptionType1(input):
         name='mixed0')
     return x
 
+def inceptionType2(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    branch1x1 = conv2d_bn(input, 192, 1, 1)
+
+    branch7x7 = conv2d_bn(input, 128, 1, 1)
+    branch7x7 = conv2d_bn(branch7x7, 128, 1, 7)
+    branch7x7 = conv2d_bn(branch7x7, 192, 7, 1)
+
+    branch7x7dbl = conv2d_bn(input, 128, 1, 1)
+    branch7x7dbl = conv2d_bn(branch7x7dbl, 128, 7, 1)
+    branch7x7dbl = conv2d_bn(branch7x7dbl, 128, 1, 7)
+    branch7x7dbl = conv2d_bn(branch7x7dbl, 128, 7, 1)
+    branch7x7dbl = conv2d_bn(branch7x7dbl, 192, 1, 7)
+
+    branch_pool = layers.AveragePooling2D((3, 3),
+                                          strides=(1, 1),
+                                          padding='same')(input)
+    branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
+    x = layers.concatenate(
+        [branch1x1, branch7x7, branch7x7dbl, branch_pool],
+        axis=channel_axis,
+        name='mixed4')
+    return x
+
+
 def inception_dim(input):
     #Mengingat Konfigurasi Keras bisa channel first atau last
     if K.image_data_format() == 'channels_first':
