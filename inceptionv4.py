@@ -18,14 +18,14 @@ def conv2d_bn(x, nb_filter, num_row, num_col,
         channel_axis = 1
     else:
         channel_axis = -1
-    x = Convolution2D(nb_filter, (num_row, num_col),
+    x = keras.layers.Convolution2D(nb_filter, (num_row, num_col),
                       strides=strides,
                       padding=padding,
                       use_bias=use_bias,
                       kernel_regularizer=regularizers.l2(0.00004),
                       kernel_initializer=initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='normal', seed=None))(x)
-    x = BatchNormalization(axis=channel_axis, momentum=0.9997, scale=False)(x)
-    x = Activation('relu')(x)
+    x = keras.layers.BatchNormalization(axis=channel_axis, momentum=0.9997, scale=False)(x)
+    x = keras.layers.Activation('relu')(x)
     return x
 
 def inception_a(input):
