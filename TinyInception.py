@@ -18,3 +18,30 @@ def conv2d_bn(x, nb_filter, num_row, num_col,
     x = keras.layers.Activation('relu')(x)
 
     return x
+
+def inceptionType1(input):
+    # mixed 0: 35 x 35 x 256
+    branch1x1 = conv2d_bn(x, 64, 1, 1)
+
+    branch5x5 = conv2d_bn(x, 48, 1, 1)
+    branch5x5 = conv2d_bn(branch5x5, 64, 5, 5)
+
+    branch3x3dbl = conv2d_bn(x, 64, 1, 1)
+    branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
+    branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
+
+    branch_pool = layers.AveragePooling2D((3, 3),
+                                          strides=(1, 1),
+                                          padding='same')(x)
+    branch_pool = conv2d_bn(branch_pool, 32, 1, 1)
+    x = layers.concatenate(
+        [branch1x1, branch5x5, branch3x3dbl, branch_pool],
+        axis=channel_axis,
+        name='mixed0')
+    return x
+
+def inceptionV3Base(input):
+
+    x = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
+    x = conv2d_bn(x, 32, 3, 3, padding='valid')
+    x = conv2d_bn(x, 64, 3, 3)
