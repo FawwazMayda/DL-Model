@@ -11,3 +11,46 @@ def preprocess_input(x):
     x = np.multiply(x, 2.0)
     return x
 
+def conv2d_bn(x, nb_filter, num_row, num_col,
+              padding='same', strides=(1, 1), use_bias=False):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+    x = Convolution2D(nb_filter, (num_row, num_col),
+                      strides=strides,
+                      padding=padding,
+                      use_bias=use_bias,
+                      kernel_regularizer=regularizers.l2(0.00004),
+                      kernel_initializer=initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='normal', seed=None))(x)
+    x = BatchNormalization(axis=channel_axis, momentum=0.9997, scale=False)(x)
+    x = Activation('relu')(x)
+    return x
+
+def inception_a(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    #1x1
+    b0 = conv2d_bn(input, 96,1,1)
+    #1x1 -> 3x3
+    b1 = conv2d_bn(input,64,1,1)
+    b1 = conv2d_bn(b1,96,3,3)
+    #1x1 -> 3x3 -> 3x3
+    b2 = conv2d_bn(input,64,1,1)
+    b2 = conv2d_bn(b2,96,3,3)
+    b2 = conv2d_bn(b2,96,3,3)
+
+    b3 = keras.layers.AveragePooling2D((3,3),strides=(1,1),
+    padding='same')(input)
+    b3 = conv2d_bn(b3,96,1,1)
+
+    x= keras.layers.concatenate([b0,b1,b2,b3],axis=channel_axis)
+    return x
+
+
+
