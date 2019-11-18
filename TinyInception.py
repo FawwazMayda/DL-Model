@@ -130,6 +130,30 @@ def inception_dim(input):
         axis=channel_axis,
         name='mixed3')
 
+    return 
+    
+def inception_dim2(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    branch3x3 = conv2d_bn(input, 192, 1, 1)
+    branch3x3 = conv2d_bn(branch3x3, 320, 3, 3,
+                          strides=(2, 2), padding='valid')
+
+    branch7x7x3 = conv2d_bn(input, 192, 1, 1)
+    branch7x7x3 = conv2d_bn(branch7x7x3, 192, 1, 7)
+    branch7x7x3 = conv2d_bn(branch7x7x3, 192, 7, 1)
+    branch7x7x3 = conv2d_bn(
+        branch7x7x3, 192, 3, 3, strides=(2, 2), padding='valid')
+
+    branch_pool = layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
+    x = layers.concatenate(
+        [branch3x3, branch7x7x3, branch_pool],
+        axis=channel_axis,
+        name='mixed8')
     return x
 
 
