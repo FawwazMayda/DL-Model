@@ -45,6 +45,30 @@ def inceptionType1(input):
         name='mixed0')
     return x
 
+def inception_dim(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+
+     branch3x3 = conv2d_bn(input, 384, 3, 3, strides=(2, 2), padding='valid')
+
+    branch3x3dbl = conv2d_bn(input, 64, 1, 1)
+    branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
+    branch3x3dbl = conv2d_bn(
+        branch3x3dbl, 96, 3, 3, strides=(2, 2), padding='valid')
+
+    branch_pool = layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
+    x = layers.concatenate(
+        [branch3x3, branch3x3dbl, branch_pool],
+        axis=channel_axis,
+        name='mixed3')
+
+    return x
+
+
 def inceptionV3Base(input):
 
     x = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
