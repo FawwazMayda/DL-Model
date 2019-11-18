@@ -22,10 +22,11 @@ def conv2d_bn(x, nb_filter, num_row, num_col,
                       strides=strides,
                       padding=padding,
                       use_bias=use_bias,
-                      kernel_regularizer=regularizers.l2(0.00004),
-                      kernel_initializer=initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='normal', seed=None))(x)
+                      kernel_regularizer=keras.regularizers.l2(0.00004),
+                      kernel_initializer=keras.initializers.VarianceScaling(scale=2.0, mode='fan_in', distribution='normal', seed=None))(x)
     x = keras.layers.BatchNormalization(axis=channel_axis, momentum=0.9997, scale=False)(x)
     x = keras.layers.Activation('relu')(x)
+
     return x
 
 def inception_a(input):
@@ -88,7 +89,7 @@ def inception_b(input):
     b2 = conv2d_bn(b2, 224, 7, 1)
     b2 = conv2d_bn(b2, 256, 1, 7)
 
-    b3 = AveragePooling2D((3,3), strides=(1,1), padding='same')(input)
+    b3 = keras.layers.AveragePooling2D((3,3), strides=(1,1), padding='same')(input)
     b3 = conv2d_bn(b3,128,1,1)
 
     x = keras.layers.concatenate([b0,b1,b2,b3],axis=channel_axis)
