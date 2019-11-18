@@ -1,5 +1,6 @@
 import numpy as np 
 import keras
+from keras import backend as K
 
 def conv2d_bn(x, nb_filter, num_row, num_col,
               padding='same', strides=(1, 1), use_bias=False):
@@ -35,14 +36,13 @@ def inceptionType1(input):
     branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
     branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
 
-    branch_pool = layers.AveragePooling2D((3, 3),
+    branch_pool = keras.layers.AveragePooling2D((3, 3),
                                           strides=(1, 1),
                                           padding='same')(input)
     branch_pool = conv2d_bn(branch_pool, 32, 1, 1)
-    x = layers.concatenate(
+    x = keras.layers.concatenate(
         [branch1x1, branch5x5, branch3x3dbl, branch_pool],
-        axis=channel_axis,
-        name='mixed0')
+        axis=channel_axis)
     return x
 
 def inceptionType2(input):
@@ -64,14 +64,13 @@ def inceptionType2(input):
     branch7x7dbl = conv2d_bn(branch7x7dbl, 128, 7, 1)
     branch7x7dbl = conv2d_bn(branch7x7dbl, 192, 1, 7)
 
-    branch_pool = layers.AveragePooling2D((3, 3),
+    branch_pool = keras.layers.AveragePooling2D((3, 3),
                                           strides=(1, 1),
                                           padding='same')(input)
     branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-    x = layers.concatenate(
+    x = keras.layers.concatenate(
         [branch1x1, branch7x7, branch7x7dbl, branch_pool],
-        axis=channel_axis,
-        name='mixed4')
+        axis=channel_axis)
     return x
 
 def inceptionType3(input):
@@ -87,25 +86,23 @@ def inceptionType3(input):
         branch3x3 = conv2d_bn(input, 384, 1, 1)
         branch3x3_1 = conv2d_bn(branch3x3, 384, 1, 3)
         branch3x3_2 = conv2d_bn(branch3x3, 384, 3, 1)
-        branch3x3 = layers.concatenate(
+        branch3x3 = keras.layers.concatenate(
             [branch3x3_1, branch3x3_2],
-            axis=channel_axis,
-            name='mixed9')
+            axis=channel_axis)
 
         branch3x3dbl = conv2d_bn(input, 448, 1, 1)
         branch3x3dbl = conv2d_bn(branch3x3dbl, 384, 3, 3)
         branch3x3dbl_1 = conv2d_bn(branch3x3dbl, 384, 1, 3)
         branch3x3dbl_2 = conv2d_bn(branch3x3dbl, 384, 3, 1)
-        branch3x3dbl = layers.concatenate(
+        branch3x3dbl = keras.layers.concatenate(
             [branch3x3dbl_1, branch3x3dbl_2], axis=channel_axis)
 
-        branch_pool = layers.AveragePooling2D(
+        branch_pool = keras.layers.AveragePooling2D(
             (3, 3), strides=(1, 1), padding='same')(input)
         branch_pool = conv2d_bn(branch_pool, 192, 1, 1)
-        x = layers.concatenate(
+        x = keras.layers.concatenate(
             [branch1x1, branch3x3, branch3x3dbl, branch_pool],
-            axis=channel_axis,
-            name='mixed')
+            axis=channel_axis)
         return x
 
 
@@ -117,20 +114,19 @@ def inception_dim(input):
         channel_axis = -1
 
 
-     branch3x3 = conv2d_bn(input, 384, 3, 3, strides=(2, 2), padding='valid')
+    branch3x3 = conv2d_bn(input, 384, 3, 3, strides=(2, 2), padding='valid')
 
     branch3x3dbl = conv2d_bn(input, 64, 1, 1)
     branch3x3dbl = conv2d_bn(branch3x3dbl, 96, 3, 3)
     branch3x3dbl = conv2d_bn(
         branch3x3dbl, 96, 3, 3, strides=(2, 2), padding='valid')
 
-    branch_pool = layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
-    x = layers.concatenate(
+    branch_pool = keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
+    x = keras.layers.concatenate(
         [branch3x3, branch3x3dbl, branch_pool],
-        axis=channel_axis,
-        name='mixed3')
+        axis=channel_axis)
 
-    return 
+    return x
     
 def inception_dim2(input):
     #Mengingat Konfigurasi Keras bisa channel first atau last
@@ -149,21 +145,20 @@ def inception_dim2(input):
     branch7x7x3 = conv2d_bn(
         branch7x7x3, 192, 3, 3, strides=(2, 2), padding='valid')
 
-    branch_pool = layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
-    x = layers.concatenate(
+    branch_pool = keras.layers.MaxPooling2D((3, 3), strides=(2, 2))(input)
+    x = keras.layers.concatenate(
         [branch3x3, branch7x7x3, branch_pool],
-        axis=channel_axis,
-        name='mixed8')
+        axis=channel_axis)
     return x
 
 
-def inceptionV3Base(input):
+def inceptionV3Base():
 
 
     inputs = keras.layers.Input((64,64,3))
-    net = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
-    net = conv2d_bn(x, 32, 3, 3, padding='valid')
-    net = conv2d_bn(x, 64, 3, 3)
+    net = conv2d_bn(inputs, 32, 3, 3, strides=(2, 2), padding='valid')
+    net = conv2d_bn(net, 32, 3, 3, padding='valid')
+    net = conv2d_bn(net, 64, 3, 3)
 
     for i in range(2):
         net = inceptionType1(net)
@@ -176,5 +171,4 @@ def inceptionV3Base(input):
 
     net = keras.layers.AveragePooling2D()(net)
     model = keras.models.Model(inputs,net,name='TinyInception')
-
-    
+    return model
