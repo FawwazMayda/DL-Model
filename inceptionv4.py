@@ -141,7 +141,63 @@ def inception_c(input):
     x = keras.layers.concatenate([b0,b1,b2,b3],axis=channel_axis)
 
 
+def inceptionV4Base(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    net = conv2d_bn(input,32,3,3,strides=(2,2),padding='valid')
+    net = conv2d_bn(net,32,3,3,padding='valid')
+    net = conv2d_bn(net,64,3,3)
+
+
+
+    b0 = keras.layers.MaxPooling2D((3,3),strides=(2,2),padding='valid')(net)
+    b1 =  conv2d_bn(net,96,3,3,strides=(2,2),padding='valid')
+    net = keras.layers.concatenate([b0,b1],axis=channel_axis)
+
+
+
+    b0 = conv2d_bn(net,64,1,1)
+    b0 = conv2d_bn(b0,96,3,3,padding='valid')
+
+    b1 = conv2d_bn(net,64,1,1)
+    b1 = conv2d_bn(b1,64,1,7)
+    b1 = conv2d_bn(b1,64,7,1)
+    b1 = conv2d_bn(b1,96,3,3,padding='valid')
+
+    net = keras.layers.concatenate([b0,b1],axis=channel_axis)
+
+
+    b0 = conv2d_bn(net,192,3,3,padding='valid',strides=(2,2),padding='valid')
+    b1 = keras.layers.MaxPooling2D((3,3),strides=(2,2),padding='valid')(net)
+
+    net = keras.layers.concatenate([b0,b1],axis=channel_axis)
+
+    for i in range(4):
+        net = inception_a(net)
     
+    net = reduction_a(net)
+
+    for i in range(7):
+        net = inception_b(net)
+
+    net = reduction_b(net)
+
+    for i in range(5):
+        net = inception_c(net)
+    
+    return net
+    
+
+
+
+
+
+
+
 
 
 
