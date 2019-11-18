@@ -171,7 +171,7 @@ def inceptionV4Base(input):
     net = keras.layers.concatenate([b0,b1],axis=channel_axis)
 
 
-    b0 = conv2d_bn(net,192,3,3,padding='valid',strides=(2,2),padding='valid')
+    b0 = conv2d_bn(net,192,3,3,padding='valid',strides=(2,2))
     b1 = keras.layers.MaxPooling2D((3,3),strides=(2,2),padding='valid')(net)
 
     net = keras.layers.concatenate([b0,b1],axis=channel_axis)
