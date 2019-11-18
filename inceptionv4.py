@@ -190,6 +190,54 @@ def inceptionV4Base(input):
         net = inception_c(net)
     
     return net
+
+def inceptionV4(jumlah_kelas,input_shape,dropout_keep_rate,weights,include_top):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    a,b = input_shape
+    if K.image_data_format() == 'channels_first':
+        inputs = keras.layers.Input((3,a,b))
+    else:
+        inputs = keras.layers.Input((a,b,3))
+
+    x =  inceptionV4Base(inputs)
+
+    if include_top:
+        x = keras.layers.AveragePooling2D((8,8),padding='valid')(x)
+        x = keras.layers.Dropout(dropout_keep_rate)(x)
+        #Hasil Embeddings
+        x = keras.layers.Flatten()(x)
+        x = keras.layers.Dense(jumlah_kelas,activation='softmax')(x)
+
+    model = keras.models.Model(inputs,x,name='InceptionV4')
+
+    # load weights
+    if weights == 'imagenet':
+        if K.image_data_format() == 'channels_first':
+            if K.backend() == 'tensorflow':
+                warnings.warn('You are using the TensorFlow backend, yet you '
+                              'are using the Theano '
+                              'image data format convention '
+                              '(`image_data_format="channels_first"`). '
+                              'For best performance, set '
+                              '`image_data_format="channels_last"` in '
+                              'your Keras config '
+                              'at ~/.keras/keras.json.')
+        if include_top:
+            weights_path = get_file(
+                'inception-v4_weights_tf_dim_ordering_tf_kernels.h5',
+                WEIGHTS_PATH,
+                cache_subdir='models',
+                md5_hash='9fe79d77f793fe874470d84ca6ba4a3b')
+        else:
+            weights_path = get_file(
+                'inception-v4_weights_tf_dim_ordering_tf_kernels_notop.h5',
+                WEIGHTS_PATH_NO_TOP,
+                cache_subdir='models',
+                md5_hash='9296b46b5971573064d12e4669110969')
+        model.load_weights(weights_path, by_name=True)
+
+    return model
+
     
 
 
