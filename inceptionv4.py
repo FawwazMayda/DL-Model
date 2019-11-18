@@ -115,7 +115,36 @@ def reduction_b(input):
     return x
 
 def inception_c(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    b0 = conv2d_bn(input,256,1,1)
+
+    b1 = conv2d_bn(input,384,1,1)
+    b10 = conv2d_bn(b1,256,1,3)
+    b11 = conv2d_bn(b1,256,3,1)
+    b1 = keras.layers.concatenate([b10,b11],axis=channel_axis)
+
+    b2 = conv2d_bn(input,384,1,1)
+    b2 = conv2d_bn(b2,448,3,1)
+    b2 = conv2d_bn(b2,512,1,3)
+    b20 = conv2d_bn(b2,256,1,3)
+    b21 = conv2d_bn(b2,256,3,1)
+    b2 = keras.layers.concatenate([b20,b21],axis=channel_axis)
+
+    b3 = keras.layers.AveragePooling2D((3,3),strides=(1,1),padding='same')(input)
+    b3 = conv2d_bn(b3,256,1,1)
     
+    x = keras.layers.concatenate([b0,b1,b2,b3],axis=channel_axis)
+
+
+    
+
+
+
 
 
 
