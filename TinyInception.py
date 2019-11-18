@@ -159,6 +159,22 @@ def inception_dim2(input):
 
 def inceptionV3Base(input):
 
-    x = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
-    x = conv2d_bn(x, 32, 3, 3, padding='valid')
-    x = conv2d_bn(x, 64, 3, 3)
+
+    inputs = keras.layers.Input((64,64,3))
+    net = conv2d_bn(input, 32, 3, 3, strides=(2, 2), padding='valid')
+    net = conv2d_bn(x, 32, 3, 3, padding='valid')
+    net = conv2d_bn(x, 64, 3, 3)
+
+    for i in range(2):
+        net = inceptionType1(net)
+    net = inception_dim(net)
+
+    for i in range(3):
+        net = inceptionType2(net)
+    net = inception_dim2(net)
+    net = inceptionType3(net)
+
+    net = keras.layers.AveragePooling2D()(net)
+    model = keras.models.Model(inputs,net,name='TinyInception')
+
+    
