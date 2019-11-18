@@ -10,3 +10,4 @@ def preprocess_input(x):
     x = np.subtract(x , 0.5)
     x = np.multiply(x, 2.0)
     return x
+
