@@ -94,6 +94,31 @@ def inception_b(input):
     x = keras.layers.concatenate([b0,b1,b2,b3],axis=channel_axis)
     return x
 
+def reduction_b(input):
+    #Mengingat Konfigurasi Keras bisa channel first atau last
+    if K.image_data_format() == 'channels_first':
+        channel_axis = 1
+    else:
+        channel_axis = -1
+
+    b0 = conv2d_bn(input,192,1,1)
+    b0 = conv2d_bn(b0,192,3,3,strides=(2,2),padding='valid')
+
+    b1 = conv2d_bn(input,256,1,1)
+    b1 = conv2d_bn(b1,256,1,7)
+    b1 = conv2d_bn(b1,320,7,1)
+    b1 = conv2d_bn(b1,320,3,3,strides=(2,2),padding='valid')
+
+    b2 = keras.layers.MaxPooling2D((3,3),strides=(2,2),padding='valid')(input)
+
+    x = keras.layers.concatenate([b0,b1,b2],axis=channel_axis)
+    return x
+
+def inception_c(input):
+    
+
+
+
 
     
 
