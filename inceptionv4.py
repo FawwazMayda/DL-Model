@@ -192,13 +192,13 @@ def inceptionV4Base(input):
     
     return net
 
-def inceptionV4(jumlah_kelas,input_shape,dropout_keep_rate,weights,include_top):
+def inceptionV4(jumlah_kelas,dropout_keep_rate,weights,include_top):
     #Mengingat Konfigurasi Keras bisa channel first atau last
     a,b = input_shape
     if K.image_data_format() == 'channels_first':
-        inputs = keras.layers.Input((3,a,b))
+        inputs = keras.layers.Input((3,229,229))
     else:
-        inputs = keras.layers.Input((a,b,3))
+        inputs = keras.layers.Input((299,299,3))
 
     x =  inceptionV4Base(inputs)
 
