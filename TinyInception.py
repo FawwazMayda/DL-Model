@@ -152,7 +152,7 @@ def inception_dim2(input):
     return x
 
 
-def inceptionV3Base():
+def inceptionV3Base(jumlah_kelas):
 
 
     inputs = keras.layers.Input((64,64,3))
@@ -170,5 +170,9 @@ def inceptionV3Base():
     net = inceptionType3(net)
 
     net = keras.layers.AveragePooling2D()(net)
+    if jumlah_kelas>2:
+        net = keras.layers.Dense(2,activation='sigmoid')(net)
+    else:
+        net = keras.layers.Dense(jumlah_kelas,activation='softmax')(net)
     model = keras.models.Model(inputs,net,name='TinyInception')
     return model
