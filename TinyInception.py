@@ -171,8 +171,8 @@ def inceptionV3Base(jumlah_kelas):
 
     net = keras.layers.AveragePooling2D()(net)
     if jumlah_kelas>2:
-        net = keras.layers.Dense(2,activation='sigmoid')(net)
+        net = keras.layers.Dense(2,activation='sigmoid',name='prediction')(net)
     else:
-        net = keras.layers.Dense(jumlah_kelas,activation='softmax')(net)
+        net = keras.layers.Dense(jumlah_kelas,activation='softmax',name='prediction')(net)
     model = keras.models.Model(inputs,net,name='TinyInception')
     return model
