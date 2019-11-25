@@ -170,6 +170,8 @@ def inceptionV3Base(jumlah_kelas):
     net = inceptionType3(net)
 
     net = keras.layers.AveragePooling2D()(net)
+    net = keras.layers.Dense(512,activation='relu')(net)
+    net = keras.layers.Dense(256,activation='relu')(net)
     if jumlah_kelas>2:
         net = keras.layers.Dense(jumlah_kelas,activation='softmax',name='prediction')(net)
     else:
